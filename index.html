@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secure Device Wipe Tool</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    h1, h2, h3 {
+      color: #333;
+    }
+    .warning {
+      background-color: #ffcccc;
+      padding: 15px;
+      border: 1px solid #cc0000;
+      margin-bottom: 20px;
+    }
+    .permission {
+      margin: 20px 0;
+      padding: 15px;
+      background-color: #e6f3ff;
+      border: 1px solid #0066cc;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin: 10px 0;
+    }
+    button:hover {
+      background-color: #0055b3;
+    }
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    .hidden {
+      display: none;
+    }
+    select {
+      padding: 10px;
+      margin: 10px 0;
+      width: 100%;
+      max-width: 300px;
+    }
+    .instructions {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: white;
+      border: 1px solid #ddd;
+    }
+    .progress-tracker {
+      margin: 20px 0;
+      padding: 10px;
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+    }
+    .progress-tracker span {
+      margin-right: 10px;
+      font-weight: bold;
+    }
+    .progress-tracker .active {
+      color: #0066cc;
+    }
+    .checkbox-container {
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Secure Device Wipe Tool</h1>
+  <div class="warning">
+    <h3>Warning</h3>
+    <p>This tool provides instructions to <strong>permanently delete all data</strong> on your device or emulator, including files, apps, and settings. This action is <strong>irreversible</strong>, and no data can be recovered after completion. Use this tool only if you are certain you want to proceed, such as before selling your device.</p>
+  </div>
+
+  <div class="progress-tracker">
+    <span class="active">Step 1: Grant Permission</span> → 
+    <span>Step 2: Select Device</span> → 
+    <span>Step 3: Follow Instructions</span>
+  </div>
+
+  <div class="permission">
+    <h3>Step 1: Grant Permission</h3>
+    <p>Do you understand that this process will permanently erase all data and cannot be undone? Check the box and click "Proceed" to continue.</p>
+    <div class="checkbox-container">
+      <input type="checkbox" id="confirm" onchange="toggleProceedButton()">
+      <label for="confirm">I understand that all data will be permanently deleted and cannot be recovered.</label>
+    </div>
+    <button id="proceedButton" disabled onclick="grantPermission()">Proceed</button>
+  </div>
+
+  <div id="deviceSelection" class="hidden">
+    <h2>Step 2: Select Your Device Type</h2>
+    <select id="deviceType" onchange="showInstructions()">
+      <option value="">Select a device type</option>
+      <option value="android">Android (Physical Device)</option>
+      <option value="android_emulator">Android (Emulator on Windows)</option>
+      <option value="ios">iPhone (iOS)</option>
+      <option value="windows">Windows PC</option>
+      <option value="macos">Mac (macOS)</option>
+      <option value="linux">Linux</option>
+    </select>
+
+    <div id="instructions" class="instructions hidden">
+      <h3>Step 3: Follow Instructions</h3>
+    </div>
+  </div>
+
+  <script>
+    function toggleProceedButton() {
+      const checkbox = document.getElementById('confirm');
+      const proceedButton = document.getElementById('proceedButton');
+      proceedButton.disabled = !checkbox.checked;
+    }
+
+    function grantPermission() {
+      document.getElementById('deviceSelection').classList.remove('hidden');
+      document.querySelector('.permission').classList.add('hidden');
+      document.querySelector('.progress-tracker span:nth-child(1)').classList.remove('active');
+      document.querySelector('.progress-tracker span:nth-child(2)').classList.add('active');
+    }
+
+    function showInstructions() {
+      const deviceType = document.getElementById('deviceType').value;
+      const instructionsDiv = document.getElementById('instructions');
+      instructionsDiv.classList.remove('hidden');
+      document.querySelector('.progress-tracker span:nth-child(2)').classList.remove('active');
+      document.querySelector('.progress-tracker span:nth-child(3)').classList.add('active');
+      let instructions = '';
+
+      switch (deviceType) {
+        case 'android':
+          instructions = `
+            <h3>Android Device Wipe Instructions (Physical Device)</h3>
+            <p><strong>Warning:</strong> This will erase all data, including apps, photos, and settings.</p>
+            <ol>
+              <li>Back up any data you want to keep (this tool does not handle backups).</li>
+              <li>Go to <strong>Settings > System > Reset options</strong>.</li>
+              <li>Select <strong>Erase all data (factory reset)</strong>.</li>
+              <li>Follow the prompts to confirm. Your device will restart and wipe all data.</li>
+              <li>For added security, enable <strong>Secure Startup</strong> before selling (requires a PIN).</li>
+            </ol>
+            <p><strong>Note:</strong> Menu names may vary by device. Check your device's manual. Test these steps on an emulator first if unsure.</p>
+          `;
+          break;
+        case 'android_emulator':
+          instructions = `
+            <h3>Android Emulator Wipe Instructions (Windows)</h3>
+            <p><strong>Warning:</strong> This will erase all data on the emulated device, including apps and settings. Use an emulator to test the process safely before wiping a physical device.</p>
+            <ol>
+              <li>Install an emulator like <strong>Android Studio Emulator</strong> (<a href="https://developer.android.com/studio" target="_blank">developer.android.com</a>) or <strong>BlueStacks</strong> (<a href="https://www.bluestacks.com" target="_blank">www.bluestacks.com</a>).</li>
+              <li>Create an Android Virtual Device (AVD) with your desired Android version (e.g., Android 11 or 12).</li>
+              <li>Open the emulator and go to <strong>Settings > System > Reset options</strong>.</li>
+              <li>Select <strong>Erase all data (factory reset)</strong> and confirm. The emulator will reset to a fresh state.</li>
+              <li>Test this tool’s responsiveness by opening a browser (e.g., Chrome) in the emulator and navigating to this website.</li>
+              <li>Verify that these instructions work. If errors occur, check your emulator’s documentation or try a different Android version.</li>
+            </ol>
+            <p><strong>Note:</strong> Emulators are ideal for testing without risking real device data. Use Android Studio for advanced testing across multiple device configurations.</p>
+          `;
+          break;
+        case 'ios':
+          instructions = `
+            <h3>iPhone (iOS) Wipe Instructions</h3>
+            <p><strong>Warning:</strong> This will erase all data, including apps, photos, and settings.</p>
+            <ol>
+              <li>Sign out of iCloud: Go to <strong>Settings > [Your Name] > Sign Out</strong>.</li>
+              <li>Back up any data you want to keep (this tool does not handle backups).</li>
+              <li>Go to <strong>Settings > General > Transfer or Reset iPhone</strong>.</li>
+              <li>Select <strong>Erase All Content and Settings</strong>.</li>
+              <li>Enter your Apple ID password if prompted. The device will wipe and restart.</li>
+            </ol>
+            <p><strong>Note:</strong> Ensure Find My iPhone is disabled before selling to avoid activation lock.</p>
+          `;
+          break;
+        case 'windows':
+          instructions = `
+            <h3>Windows PC Wipe Instructions</h3>
+            <p><strong>Warning:</strong> This will erase all data, including files, apps, and settings.</p>
+            <ol>
+              <li>Back up any data you want to keep (this tool does not handle backups).</li>
+              <li>Go to <strong>Settings > System > Recovery</strong>.</li>
+              <li>Under <strong>Reset this PC</strong>, click <strong>Get Started</strong>.</li>
+              <li>Choose <strong>Remove everything</strong>.</li>
+              <li>Select <strong>Local reinstall</strong> or <strong>Cloud download</strong>, then choose <strong>Fully clean the drive</strong> for a secure wipe.</li>
+              <li>Follow the prompts to reset your PC.</li>
+            </ol>
+            <p><strong>Note:</strong> For extra security, use a third-party tool like DBAN (<a href="https://dban.org" target="_blank">dban.org</a>) to overwrite the drive.</p>
+          `;
+          break;
+        case 'macos':
+          instructions = `
+            <h3>Mac (macOS) Wipe Instructions</h3>
+            <p><strong>Warning:</strong> This will erase all data, including files, apps, and settings.</p>
+            <ol>
+              <li>Sign out of iCloud: Go to <strong>System Settings > [Your Name] > Sign Out</strong>.</li>
+              <li>Back up any data you want to keep (this tool does not handle backups).</li>
+              <li>Restart your Mac and hold <strong>Command + R</strong> to enter Recovery Mode.</li>
+              <li>Open <strong>Disk Utility</strong>, select your main drive, and click <strong>Erase</strong>.</li>
+              <li>Choose <strong>APFS</strong> or <strong>Mac OS Extended</strong> format and erase the drive.</li>
+              <li>Exit Disk Utility and reinstall macOS if needed, or shut down the Mac.</li>
+            </ol>
+            <p><strong>Note:</strong> For M1/M2 Macs, use <strong>System Settings > General > Transfer or Reset > Erase All Content and Settings</strong> if available.</p>
+          `;
+          break;
+        case 'linux':
+          instructions = `
+            <h3>Linux Wipe Instructions</h3>
+            <p><strong>Warning:</strong> This will erase all data, including files, apps, and settings.</p>
+            <ol>
+              <li>Back up any data you want to keep (this tool does not handle backups).</li>
+              <li>Boot from a live USB (e.g., Ubuntu Live).</li>
+              <li>Open a terminal and use the <strong>shred</strong> command to overwrite the drive: <code>sudo shred -v /dev/sdX</code> (replace <code>sdX</code> with your drive).</li>
+              <li>Alternatively, use <strong>Disks</strong> or <strong>GParted</strong> to format the drive.</li>
+              <li>Reinstall Linux or leave the drive erased.</li>
+            </ol>
+            <p><strong>Note:</strong> Be cautious when selecting the drive to avoid accidental data loss.</p>
+          `;
+          break;
+        default:
+          instructions = `<p>Please select a device type to view instructions.</p>`;
+      }
+
+      instructionsDiv.innerHTML = instructions;
+    }
+  </script>
+</body>
+</html>
